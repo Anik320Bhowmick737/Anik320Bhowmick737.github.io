@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Linear Regression | AI Notes</title>
+
+    <link rel="stylesheet" href="linear-regression.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+
+    <!-- MathJax -->
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [
+            ["$", "$"],
+            ["\\(", "\\)"],
+          ],
+          displayMath: [["$$", "$$"]],
+        },
+        svg: {
+          fontCache: "global",
+        },
+      };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+  </head>
+
+  <body>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <h2>Linear Regression</h2>
+      <a href="#intro" class="nav">Introduction</a>
+      <a href="#intuition" class="nav">Intuition</a>
+      <a href="#geometry" class="nav">Geometry</a>
+      <a href="#formulation" class="nav">Formulation</a>
+      <a href="#hmatrix" class="nav">Hat Matrix</a>
+      <a href="#probabilistic" class="nav">Probabilistic View</a>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="content">
+      <!-- ✅ BREADCRUMBS ADDED HERE -->
+      <div class="breadcrumb">
+        <a href="../../index.html">Home</a>
+        <span>›</span>
+        <a href="../index.html">Foundations</a>
+        <span>›</span>
+        <span>Linear Regression</span>
+      </div>
+
+      <section id="intro" class="section">
+        <h1>Linear Regression = Projection</h1>
+        <p>
+          Linear regression is not curve fitting — it is projection into a
+          subspace.
+        </p>
+        <p>
+          Linear regression is often introduced as a method to “fit a line
+          through data points”. But that’s misleading. At its core, linear
+          regression is not about drawing a line — it is about finding the best
+          projection of a high-dimensional signal onto a lower-dimensional
+          subspace. From a statistical perspective, linear regression assumes
+          that the expected value of the output given the inputs, E(Y | X), can
+          be approximated as a linear function of the input variables. This
+          assumption might sound restrictive, but it is surprisingly powerful.
+          Before the age of modern computation, linear models were among the few
+          tools available for understanding relationships in data. Yet even
+          today, they remain one of the most widely used modeling techniques.
+          The reason is not complexity — but clarity. Linear models are simple,
+          stable, and interpretable. They allow us to understand how each input
+          influences the output in a direct and measurable way. In many
+          real-world situations — especially when data is limited, noisy, or
+          sparse — simpler models can actually perform better than highly
+          complex nonlinear methods. This happens because they avoid overfitting
+          and focus on capturing the dominant structure in the data. More
+          importantly, linear regression is not the end of modeling — it is the
+          starting point. Many advanced nonlinear techniques are built by
+          extending this simple idea: instead of changing the model completely,
+          we transform the inputs and still apply linear reasoning in a
+          higher-dimensional feature space. This is why understanding linear
+          regression is not optional — it is foundational.
+        </p>
+      </section>
+
+      <section id="intuition" class="section">
+        <h1>Intuition</h1>
+
+        <p>
+          Linear regression tries to explain a relationship between inputs and
+          outputs using a simple idea: Each input x is passed through a linear
+          model to produce a prediction ŷ. This prediction is our best guess of
+          the true output y.
+        </p>
+
+        <p
+          style="
+            font-weight: bold;
+            text-align: center;
+            color: aquamarine;
+            margin-bottom: 40px;
+          "
+        >
+          The goal is to make ŷ as close as possible to y for all data points
+          !!!
+        </p>
+        <div class="diagram-container">
+          <img
+            src="linear_regression_model_diagram.svg"
+            alt="Linear Model Diagram"
+          />
+        </div>
+        <p>
+          So in short, the model tries to learn a function that best aligns
+          predictions with reality, but it is constrained to remain linear.
+          Because of this constraint, the model cannot perfectly pass through
+          all points. The difference between the true value y and the prediction
+          ŷ is called the error (or residual). This error is not a failure — it
+          is the signal that tells us how far the model is from the true data
+          structure. So linear regression is not about eliminating error
+          completely. It is about finding the best possible compromise where the
+          total error across all points is minimized. In a 2-Dimensional
+          settings imagine trying different lines to fit the same set of data
+          points. Each line produces a different amount of error. We can think
+          of this as exploring a landscape where each point represents a
+          possible model, and the height represents the total error.
+        </p>
+        <p
+          style="
+            font-weight: bold;
+            text-align: center;
+            color: rgb(127, 255, 232);
+            margin-bottom: 10px;
+          "
+        >
+          Move the slider m and c to see how the line changes and how the error
+          changes. Try to find the line that minimizes the error !!!
+        </p>
+        <!-- 2D SIM -->
+        <div class="sim-wrapper">
+          <div id="plot2d"></div>
+
+          <div class="controls">
+            <label>m</label>
+            <input
+              type="range"
+              id="mSlider"
+              min="-5"
+              max="5"
+              step="0.1"
+              value="1"
+            />
+
+            <label>c</label>
+            <input
+              type="range"
+              id="cSlider"
+              min="-10"
+              max="10"
+              step="0.1"
+              value="0"
+            />
+
+            <div class="stats">
+              <p>m = <span id="mVal">1</span></p>
+              <p>c = <span id="cVal">0</span></p>
+              <p>Loss = <span id="lossVal">0</span></p>
+            </div>
+          </div>
+        </div>
+
+        <div id="loss3d"></div>
+      </section>
+
+      <section id="geometry" class="section">
+        <h1>Geometry</h1>
+
+        <p>Projection of y onto column space of X:</p>
+
+        <div class="math">$$ \hat{y} = X\hat{\beta} $$</div>
+      </section>
+
+      <section id="formulation" class="section">
+        <h1>Formulation</h1>
+
+        <p>Model:</p>
+
+        <div class="math">$$ y = X\beta + \varepsilon $$</div>
+
+        <p>Solution:</p>
+
+        <div class="math">$$ \hat{\beta} = (X^T X)^{-1} X^T y $$</div>
+      </section>
+
+      <section id="hmatrix" class="section">
+        <h1>Hat Matrix</h1>
+
+        <div class="math">$$ \hat{y} = Hy $$</div>
+
+        <div class="math">$$ H = X (X^T X)^{-1} X^T $$</div>
+      </section>
+
+      <section id="probabilistic" class="section">
+        <h1>Probabilistic View</h1>
+
+        <div class="math">
+          $$ \varepsilon \sim \mathcal{N}(0, \sigma^2 I) $$
+        </div>
+
+        <p>OLS becomes Maximum Likelihood Estimation under this assumption.</p>
+      </section>
+    </main>
+
+    <script>
+      const sections = document.querySelectorAll(".section");
+      const navLinks = document.querySelectorAll(".sidebar a");
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              sections.forEach((s) => s.classList.remove("active"));
+              entry.target.classList.add("active");
+
+              navLinks.forEach((link) => {
+                link.classList.toggle(
+                  "active",
+                  link.getAttribute("href") === "#" + entry.target.id,
+                );
+              });
+            }
+          });
+        },
+        {
+          threshold: 0.35, // 👈 IMPORTANT (controls when it activates)
+          root: null,
+          rootMargin: "0px 0px -20% 0px",
+        },
+      );
+
+      sections.forEach((s) => observer.observe(s));
+
+      // initial activation
+      sections[0].classList.add("active");
+    </script>
+    <script>
+      /* =========================
+     DATA + MODEL
+  ========================= */
+
+      const points2D = [
+        { x: 1, y: 2 },
+        { x: 2, y: 3 },
+        { x: 3, y: 5 },
+        { x: 4, y: 4 },
+        { x: 5, y: 6 },
+        { x: 6, y: 7 },
+      ];
+
+      function predict(x, m, c) {
+        return m * x + c;
+      }
+
+      function loss(m, c) {
+        return points2D.reduce(
+          (s, p) => s + (predict(p.x, m, c) - p.y) ** 2,
+          0,
+        );
+      }
+
+      /* =========================
+     MINIMUM PRECOMPUTE
+  ========================= */
+
+      let minPoint = { m: 0, c: 0, l: Infinity };
+
+      for (let m = -5; m <= 5; m += 0.2) {
+        for (let c = -10; c <= 10; c += 0.2) {
+          const l = loss(m, c);
+          if (l < minPoint.l) {
+            minPoint = { m, c, l };
+          }
+        }
+      }
+
+      /* =========================
+     2D PLOT (LINE + POINTS)
+  ========================= */
+
+      function draw2D(m, c) {
+        const xs = [];
+        const ys = [];
+
+        for (let x = 0; x <= 6; x += 0.1) {
+          xs.push(x);
+          ys.push(predict(x, m, c));
+        }
+
+        Plotly.react(
+          "plot2d",
+          [
+            {
+              x: points2D.map((p) => p.x),
+              y: points2D.map((p) => p.y),
+              mode: "markers",
+              type: "scatter",
+              name: "data",
+              marker: { size: 8, color: "#38bdf8" },
+            },
+            {
+              x: xs,
+              y: ys,
+              mode: "lines",
+              name: "model",
+              line: { color: "#a78bfa" },
+            },
+          ],
+          {
+            paper_bgcolor: "#111827",
+            plot_bgcolor: "#111827",
+            xaxis: { range: [0, 7], title: "x" },
+            yaxis: { range: [0, 10], title: "y" },
+            font: { color: "white" },
+          },
+        );
+      }
+
+      /* =========================
+     3D LOSS SURFACE + POINTS
+  ========================= */
+
+      function computeLoss(m, c) {
+        return loss(m, c);
+      }
+
+      const mGrid = [];
+      const cGrid = [];
+      const zGrid = [];
+
+      for (let m = -5; m <= 5; m += 0.5) {
+        for (let c = -10; c <= 10; c += 0.5) {
+          mGrid.push(m);
+          cGrid.push(c);
+          zGrid.push(loss(m, c));
+        }
+      }
+
+      const surface = {
+        type: "mesh3d",
+        x: mGrid,
+        y: cGrid,
+        z: zGrid,
+        opacity: 0.6,
+        colorscale: "Viridis",
+      };
+
+      const currentPoint = {
+        x: [0],
+        y: [0],
+        z: [0],
+        mode: "markers",
+        type: "scatter3d",
+        marker: { size: 5, color: "red" },
+        name: "current",
+      };
+
+      const minMarker = {
+        x: [minPoint.m],
+        y: [minPoint.c],
+        z: [minPoint.l],
+        mode: "markers",
+        type: "scatter3d",
+        marker: { size: 6, color: "green" },
+        name: "minimum",
+      };
+
+      Plotly.newPlot("loss3d", [surface, currentPoint, minMarker], {
+        paper_bgcolor: "#111827",
+        plot_bgcolor: "#111827",
+        margin: { t: 0 },
+        scene: {
+          xaxis: { title: "m" },
+          yaxis: { title: "c" },
+          zaxis: { title: "loss" },
+        },
+      });
+
+      /* =========================
+     CONTROLS + LIVE UPDATE
+  ========================= */
+
+      const mSlider = document.getElementById("mSlider");
+      const cSlider = document.getElementById("cSlider");
+
+      const mVal = document.getElementById("mVal");
+      const cVal = document.getElementById("cVal");
+      const lossVal = document.getElementById("lossVal");
+
+      const status = document.createElement("div");
+      status.style.color = "#22c55e";
+      status.style.fontWeight = "bold";
+      document.querySelector(".stats")?.appendChild(status);
+
+      function update() {
+        const m = parseFloat(mSlider.value);
+        const c = parseFloat(cSlider.value);
+        const l = loss(m, c);
+
+        mVal.textContent = m;
+        cVal.textContent = c;
+        lossVal.textContent = l.toFixed(2);
+
+        draw2D(m, c);
+
+        // update 3D current point
+        Plotly.restyle(
+          "loss3d",
+          {
+            x: [[m]],
+            y: [[c]],
+            z: [[l]],
+          },
+          1,
+        );
+
+        // minimum check
+        const eps = 0.5;
+        if (Math.abs(l - minPoint.l) < eps) {
+          status.textContent = "✅ Reached Minimum!";
+        } else {
+          status.textContent = "";
+        }
+      }
+
+      mSlider.oninput = update;
+      cSlider.oninput = update;
+
+      draw2D(1, 0);
+      update();
+    </script>
+  </body>
+</html>
