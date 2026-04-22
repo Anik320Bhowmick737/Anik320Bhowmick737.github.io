@@ -38,20 +38,18 @@ body {
 .layer {
   position: absolute;
   inset: 0;
-
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* 🔥 FIX */
+  align-items: flex-start;
   flex-direction: column;
-
-  padding-top: 12vh; /* 🔥 spacing */
+  padding-top: 12vh;
 }
 
 /* HERO */
 .hero {
   z-index: 2;
-  background: radial-gradient(circle at 30% 30%, rgba(59,130,246,0.4), transparent 60%);
   align-items: center;
+  background: radial-gradient(circle at 30% 30%, rgba(59,130,246,0.4), transparent 60%);
 }
 
 /* CONTENT */
@@ -59,8 +57,7 @@ body {
   z-index: 1;
   background: #0b1220;
   opacity: 0;
-
-  overflow-y: auto; /* 🔥 FIX */
+  overflow-y: auto;
 }
 
 /* GRID */
@@ -86,7 +83,7 @@ body {
   transition: all 0.3s ease;
 }
 
-/* ✨ GLOW */
+/* GLOW */
 .card:hover {
   transform: translateY(-8px) scale(1.03);
   border-color: #38bdf8;
@@ -150,38 +147,50 @@ gsap.registerPlugin(ScrollTrigger);
 
 window.addEventListener("load", () => {
 
+  // INITIAL STATES
   gsap.set(".content", { opacity: 0 });
   gsap.set(".card", { opacity: 0, y: 40 });
 
+  // =========================
+  // HERO ↔ CONTENT TRANSITION (SCROLL CONTROLLED)
+  // =========================
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: ".wrapper",
       start: "top top",
-      end: "+=180%",   // 🔥 more scroll room
+      end: "+=160%",
       scrub: 1
     }
   });
 
-  // HERO FADE OUT
   tl.to(".hero", {
     opacity: 0,
     scale: 0.97,
     ease: "power2.out"
   });
 
-  // CONTENT FADE IN
   tl.to(".content", {
     opacity: 1,
     ease: "power2.out"
-  }, "<0.15");
+  }, "<0.2");
 
-  // CARD STAGGER
-  tl.to(".card", {
-    opacity: 1,
-    y: 0,
-    stagger: 0.15,
-    ease: "power3.out"
-  }, "-=0.1");
+  // =========================
+  // CARDS (TRIGGERED ONCE → FIXES HALF STATE BUG)
+  // =========================
+  ScrollTrigger.create({
+    trigger: ".wrapper",
+    start: "top+=55% top",
+    once: true,
+    onEnter: () => {
+      gsap.to(".card", {
+        opacity: 1,
+        y: 0,
+        stagger: 0.15,
+        duration: 0.8,
+        ease: "power3.out"
+      });
+    }
+  });
 
 });
 </script>
