@@ -23,10 +23,10 @@ body {
 
 /* SCROLL SPACE */
 .wrapper {
-  height: 220vh; /* controls scroll length */
+  height: 220vh;
 }
 
-/* STAGE (Apple style scene) */
+/* STAGE */
 .stage {
   position: sticky;
   top: 0;
@@ -38,17 +38,20 @@ body {
 .layer {
   position: absolute;
   inset: 0;
+
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: flex-start; /* 🔥 FIX */
   flex-direction: column;
+
+  padding-top: 12vh; /* 🔥 spacing */
 }
 
 /* HERO */
 .hero {
   z-index: 2;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(59,130,246,0.4), transparent 60%);
+  background: radial-gradient(circle at 30% 30%, rgba(59,130,246,0.4), transparent 60%);
+  align-items: center;
 }
 
 /* CONTENT */
@@ -56,7 +59,8 @@ body {
   z-index: 1;
   background: #0b1220;
   opacity: 0;
-  padding-top: 10vh;
+
+  overflow-y: auto; /* 🔥 FIX */
 }
 
 /* GRID */
@@ -66,6 +70,7 @@ body {
   gap: 28px;
   width: 80%;
   max-width: 1000px;
+  margin: 0 auto;
 }
 
 /* CARD */
@@ -81,7 +86,7 @@ body {
   transition: all 0.3s ease;
 }
 
-/* ✨ GLOW HOVER */
+/* ✨ GLOW */
 .card:hover {
   transform: translateY(-8px) scale(1.03);
   border-color: #38bdf8;
@@ -145,40 +150,38 @@ gsap.registerPlugin(ScrollTrigger);
 
 window.addEventListener("load", () => {
 
-  // SET INITIAL STATES (important)
   gsap.set(".content", { opacity: 0 });
   gsap.set(".card", { opacity: 0, y: 40 });
 
-  // MASTER TIMELINE
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: ".wrapper",
       start: "top top",
-      end: "bottom top",
+      end: "+=180%",   // 🔥 more scroll room
       scrub: 1
     }
   });
 
-  // HERO fades out
+  // HERO FADE OUT
   tl.to(".hero", {
     opacity: 0,
     scale: 0.97,
     ease: "power2.out"
   });
 
-  // CONTENT fades in OVER hero
+  // CONTENT FADE IN
   tl.to(".content", {
     opacity: 1,
     ease: "power2.out"
   }, "<0.15");
 
-  // CARDS appear
+  // CARD STAGGER
   tl.to(".card", {
     opacity: 1,
     y: 0,
     stagger: 0.15,
     ease: "power3.out"
-  }, "-=0.3");
+  }, "-=0.1");
 
 });
 </script>
