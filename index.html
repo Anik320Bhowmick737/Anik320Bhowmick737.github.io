@@ -21,18 +21,23 @@ body {
   overflow-x: hidden;
 }
 
-/* STAGE */
-.stage {
-  position: relative;
-  height: 200vh;
+/* SCROLL SPACE */
+.wrapper {
+  height: 200vh; /* creates scroll distance */
 }
 
-/* OVERLAY SECTIONS */
-.hero, .content {
-  position: fixed;
-  inset: 0;
+/* STAGE */
+.stage {
+  position: sticky;
+  top: 0;
   height: 100vh;
-  width: 100%;
+  overflow: hidden;
+}
+
+/* LAYERS */
+.layer {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,111 +50,80 @@ body {
   z-index: 2;
 }
 
-.hero h1 {
-  font-size: 3rem;
-  margin-bottom: 10px;
-}
-
-.hero p {
-  color: #94a3b8;
-}
-
 /* CONTENT */
 .content {
   background: #0b1220;
   z-index: 1;
   opacity: 0;
-  align-items: flex-start;
   padding-top: 10vh;
 }
 
 /* GRID */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 30px;
   width: 80%;
-  padding: 40px 0;
+  max-width: 1000px;
 }
 
 /* CARD */
 .card {
   background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.15);
   padding: 25px;
   border-radius: 14px;
+
   opacity: 0;
   transform: translateY(40px);
 
-  /* smooth interaction */
-  transition: all 0.25s ease;
-  position: relative;
-  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
-/* ✨ GLOW EFFECT */
-.card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 30% 30%, rgba(56,189,248,0.25), transparent 60%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-/* HOVER PREMIUM EFFECT */
+/* ✨ GLOW */
 .card:hover {
-  transform: translateY(-6px) scale(1.02);
-  border-color: rgba(56,189,248,0.7);
-  box-shadow: 0 0 25px rgba(56,189,248,0.25);
-}
-
-.card:hover::before {
-  opacity: 1;
-}
-
-.card h3 {
-  margin-bottom: 8px;
-}
-
-.card p {
-  color: #cbd5f5;
-  font-size: 0.9rem;
+  transform: translateY(-8px) scale(1.03);
+  border-color: #38bdf8;
+  box-shadow:
+    0 0 20px rgba(56,189,248,0.3),
+    0 0 40px rgba(56,189,248,0.2);
 }
 </style>
 </head>
 
 <body>
 
-<div class="stage">
+<div class="wrapper">
 
-  <!-- HERO -->
-  <section class="hero">
-    <h1>AI Beyond the Surface</h1>
-    <p>Scroll to explore</p>
-  </section>
+  <div class="stage">
 
-  <!-- CONTENT -->
-  <section class="content">
-    <div class="grid">
-
-      <div class="card">
-        <h3>Hat Matrix</h3>
-        <p>Projection & geometry intuition</p>
-      </div>
-
-      <div class="card">
-        <h3>Gradient Descent</h3>
-        <p>Optimization intuition</p>
-      </div>
-
-      <div class="card">
-        <h3>Eigen Intuition</h3>
-        <p>Linear transformations & directions</p>
-      </div>
-
+    <!-- HERO -->
+    <div class="layer hero">
+      <h1>AI Beyond the Surface</h1>
+      <p>Scroll to explore</p>
     </div>
-  </section>
+
+    <!-- CONTENT -->
+    <div class="layer content">
+      <div class="grid">
+        <div class="card">
+          <h3>Hat Matrix</h3>
+          <p>Projection & geometry intuition</p>
+        </div>
+
+        <div class="card">
+          <h3>Gradient Descent</h3>
+          <p>Optimization intuition</p>
+        </div>
+
+        <div class="card">
+          <h3>Eigen Intuition</h3>
+          <p>Linear transformations</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
 
 </div>
 
@@ -158,52 +132,36 @@ gsap.registerPlugin(ScrollTrigger);
 
 window.addEventListener("load", () => {
 
-  // CLEAN INITIAL STATE
-  gsap.set(".content", { opacity: 0 });
-  gsap.set(".card", { opacity: 0, y: 40 });
-
-  // HERO TRANSITION
-  gsap.to(".hero", {
-    opacity: 0,
-    y: -120,
-    ease: "power2.out",
+  // MASTER TIMELINE
+  const tl = gsap.timeline({
     scrollTrigger: {
-      trigger: ".stage",
+      trigger: ".wrapper",
       start: "top top",
-      end: "+=140%",
-      scrub: true,
-      pin: true,
-      anticipatePin: 1
+      end: "bottom top",
+      scrub: 1
     }
   });
 
-  // CONTENT FADE IN
-  gsap.to(".content", {
+  // HERO FADE OUT
+  tl.to(".hero", {
+    opacity: 0,
+    scale: 0.98,
+    ease: "power2.out"
+  });
+
+  // CONTENT FADE IN (overlay, not scroll)
+  tl.to(".content", {
     opacity: 1,
-    ease: "power3.out",
-    scrollTrigger: {
-      trigger: ".content",
-      start: "top 70%",
-      toggleActions: "play none none reverse"
-    }
-  });
+    ease: "power2.out"
+  }, "<0.2");
 
-  // CARD STAGGER (clean + balanced)
-  gsap.to(".card", {
+  // CARD STAGGER
+  tl.to(".card", {
     opacity: 1,
     y: 0,
-    stagger: {
-      each: 0.12,
-      from: "start"
-    },
-    duration: 0.7,
-    ease: "power3.out",
-    scrollTrigger: {
-      trigger: ".content",
-      start: "top 70%",
-      toggleActions: "play none none reverse"
-    }
-  });
+    stagger: 0.15,
+    ease: "power3.out"
+  }, "-=0.3");
 
 });
 </script>
