@@ -1,152 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Anik | AI Notes</title>
+<meta charset="UTF-8" />
+<title>Anik | AI Notes</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
-    }
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
 
-    body {
-      min-height: 100vh;
+html {
+  scroll-behavior: smooth;
+}
 
-      background: 
-        radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.5), transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(99, 102, 241, 0.4), transparent 50%),
-        #020617;
+body {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(59,130,246,0.5), transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(99,102,241,0.4), transparent 50%),
+    #020617;
+  color: white;
+}
 
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 20px;
+/* HERO */
+.hero {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+}
 
-      color: white;
-    }
+h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  text-shadow: 0 0 20px rgba(56,189,248,0.3);
+}
 
-    .container {
-      max-width: 900px;
-      width: 100%;
-      text-align: center;
-    }
+.intro {
+  color: #94a3b8;
+  max-width: 700px;
+  line-height: 1.7;
+}
 
-    h1 {
-      font-size: 3rem;
-      font-weight: 600;
-      margin-bottom: 20px;
-      color: white;
-      text-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
-    }
+/* SCROLL INDICATOR */
+.scroll-down {
+  margin-top: 40px;
+  font-size: 0.9rem;
+  color: #cbd5f5;
+  animation: bounce 1.2s infinite;
+  cursor: pointer;
+}
 
-    .intro {
-      color: #94a3b8;
-      font-size: 1.05rem;
-      line-height: 1.7;
-      margin-bottom: 40px;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-    }
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-    }
+/* CONTENT */
+.content {
+  padding: 80px 20px;
+  max-width: 900px;
+  margin: auto;
+}
 
-    .card {
-      backdrop-filter: blur(12px);
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 25px;
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
 
-    .card:hover {
-      transform: translateY(-8px) scale(1.02);
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(56, 189, 248, 0.6);
-      box-shadow: 0 10px 30px rgba(56, 189, 248, 0.2);
-    }
+/* CARDS (initial hidden state) */
+.card {
+  opacity: 0;
+  transform: translateY(40px);
+  backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 25px;
+  transition: all 0.6s ease;
+}
 
-    a {
-      text-decoration: none;
-      color: inherit;
-    }
+/* visible state */
+.card.show {
+  opacity: 1;
+  transform: translateY(0);
+}
 
-    .card-title {
-      font-size: 1.2rem;
-      font-weight: 500;
-      margin-bottom: 10px;
-      color: white;
-    }
+/* hover effect */
+.card:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(56,189,248,0.6);
+  box-shadow: 0 10px 30px rgba(56,189,248,0.2);
+}
 
-    .card-desc {
-      font-size: 0.9rem;
-      color: #cbd5f5;
-    }
+/* text */
+.card-title {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: white;
+}
 
-    footer {
-      margin-top: 40px;
-      font-size: 0.8rem;
-      color: #64748b;
-    }
+.card-desc {
+  color: #cbd5f5;
+  font-size: 0.9rem;
+}
 
-  </style>
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+footer {
+  text-align: center;
+  margin-top: 40px;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+</style>
 </head>
 
 <body>
 
-  <div class="container">
-    <h1>AI Beyond the Surface</h1>
+<!-- HERO -->
+<section class="hero">
+  <h1>AI Beyond the Surface</h1>
 
-    <div class="intro">
-      <p>
-        Welcome to my GitHub blog—where I break down machine learning concepts beyond formulas and into intuition.
-      </p>
-      <br>
-      <p>
-        I’m a Data Scientist by profession, and a lifelong learner who enjoys turning complex ideas into something clear and visual.
-      </p>
-    </div>
-
-    <div class="grid">
-
-      <a href="/hat-matrix">
-        <div class="card">
-          <div class="card-title">Hat Matrix</div>
-          <div class="card-desc">Projection, leverage & geometry of regression</div>
-        </div>
-      </a>
-
-      <a href="/gradient-descent">
-        <div class="card">
-          <div class="card-title">Gradient Descent</div>
-          <div class="card-desc">Optimization beyond formulas</div>
-        </div>
-      </a>
-
-      <a href="/eigen-intuition">
-        <div class="card">
-          <div class="card-title">Eigen Intuition</div>
-          <div class="card-desc">Understanding directions & transformations</div>
-        </div>
-      </a>
-
-    </div>
-
-    <footer>
-      Built by Anik 🚀
-    </footer>
+  <div class="intro">
+    <p>
+      Welcome to my GitHub blog—where I break down machine learning concepts beyond formulas and into intuition.
+    </p>
+    <br>
+    <p>
+      I’m a Data Scientist by profession, and a lifelong learner who enjoys turning complex ideas into something clear and visual.
+    </p>
   </div>
+
+  <div class="scroll-down" onclick="scrollToContent()">
+    ↓ Scroll to explore
+  </div>
+</section>
+
+<!-- CONTENT -->
+<section id="content" class="content">
+
+  <div class="grid">
+
+    <a href="/hat-matrix">
+      <div class="card">
+        <div class="card-title">Hat Matrix</div>
+        <div class="card-desc">Projection, leverage & geometry of regression</div>
+      </div>
+    </a>
+
+    <a href="/gradient-descent">
+      <div class="card">
+        <div class="card-title">Gradient Descent</div>
+        <div class="card-desc">Optimization beyond formulas</div>
+      </div>
+    </a>
+
+    <a href="/eigen-intuition">
+      <div class="card">
+        <div class="card-title">Eigen Intuition</div>
+        <div class="card-desc">Understanding directions & transformations</div>
+      </div>
+    </a>
+
+  </div>
+
+  <footer>
+    Built by Anik 🚀
+  </footer>
+
+</section>
+
+<script>
+function scrollToContent() {
+  document.getElementById("content").scrollIntoView({ behavior: "smooth" });
+}
+
+/* scroll animation */
+const cards = document.querySelectorAll('.card');
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('show');
+    }
+  });
+}, { threshold: 0.2 });
+
+cards.forEach(card => observer.observe(card));
+</script>
 
 </body>
 </html>
