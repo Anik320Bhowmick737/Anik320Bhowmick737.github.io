@@ -2,27 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Anik | AI Notes</title>
+<title>GSAP FIX TEST</title>
 
-<!-- GSAP -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-}
-
 body {
+  margin: 0;
+  font-family: Arial;
   background: #020617;
   color: white;
-  overflow-x: hidden;
 }
 
-/* SECTIONS */
 section {
   height: 100vh;
   display: flex;
@@ -31,99 +23,68 @@ section {
   flex-direction: column;
 }
 
-/* HERO */
 .hero {
-  background: radial-gradient(circle at 30% 30%, #1e3a8a, transparent 60%);
+  background: #1e3a8a;
 }
 
-.hero h1 {
-  font-size: 3rem;
-  margin-bottom: 10px;
-}
-
-.hero p {
-  color: #94a3b8;
-}
-
-/* CONTENT */
 .content {
   background: #0b1220;
+  opacity: 0;
+  transform: translateY(50px);
 }
 
-/* GRID */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-  width: 80%;
-}
-
-/* CARD */
-.card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  padding: 25px;
-  border-radius: 12px;
-  transition: 0.3s;
-}
-
-.card:hover {
-  transform: translateY(-6px);
-  border-color: #38bdf8;
+.box {
+  padding: 20px;
+  background: rgba(255,255,255,0.1);
+  margin-top: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- HERO -->
 <section class="hero">
-  <h1>AI Beyond the Surface</h1>
-  <p>Scroll to explore</p>
+  <h1>HERO SECTION</h1>
+  <p>Scroll down</p>
 </section>
 
-<!-- CONTENT -->
 <section class="content">
-  <div class="grid">
-
-    <div class="card">
-      <h3>Hat Matrix</h3>
-      <p>Projection & geometry intuition</p>
-    </div>
-
-    <div class="card">
-      <h3>Gradient Descent</h3>
-      <p>Optimization intuition</p>
-    </div>
-
-    <div class="card">
-      <h3>Eigen Intuition</h3>
-      <p>Linear transformations</p>
-    </div>
-
-  </div>
+  <h2>CONTENT SECTION</h2>
+  <div class="box">Card 1</div>
+  <div class="box">Card 2</div>
 </section>
 
 <script>
-gsap.registerPlugin(ScrollTrigger);
-
 window.addEventListener("load", () => {
 
-  // PIN HERO + FADE OUT
+  // 🔥 HARD CHECK (IMPORTANT)
+  if (!window.gsap || !window.ScrollTrigger) {
+    document.body.innerHTML = "<h1 style='color:red'>GSAP FAILED TO LOAD</h1>";
+    return;
+  }
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  console.log("GSAP + ScrollTrigger OK");
+
   gsap.timeline({
     scrollTrigger: {
       trigger: ".hero",
       start: "top top",
-      end: "+=100%",
+      end: "+=200%",   // IMPORTANT: more scroll distance
       scrub: true,
-      pin: true
+      pin: true,
+      markers: true   // 👈 TURN ON DEBUG VISUALLY
     }
   })
   .to(".hero", {
     opacity: 0,
-    y: -60,
-    ease: "none"
-  });
+    y: -80
+  })
+  .to(".content", {
+    opacity: 1,
+    y: 0
+  }, "<");
 
 });
 </script>
