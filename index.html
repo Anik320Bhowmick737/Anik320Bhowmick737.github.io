@@ -1,199 +1,291 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<title>Anik | AI Notes</title>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Anik | AI Notes</title>
 
-<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
 
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-}
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
 
-body {
-  background: #020617;
-  color: white;
-  overflow-x: hidden;
-}
+      body {
+        background: #020617;
+        color: white;
+        overflow-x: hidden;
+      }
 
-/* SCROLL SPACE */
-.wrapper {
-  height: 220vh;
-}
+      /* HERO */
+      .hero {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        background: radial-gradient(
+          circle at 30% 30%,
+          rgba(59, 130, 246, 0.4),
+          transparent 60%
+        );
+      }
 
-/* STAGE */
-.stage {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow: hidden;
-}
+      .hero-desc {
+        max-width: 650px;
+        text-align: center;
+        color: #94a3b8;
+        line-height: 1.6;
+        margin-top: 12px;
+        opacity: 0;
+        transform: translateY(20px);
+      }
 
-/* LAYERS */
-.layer {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  flex-direction: column;
-  padding-top: 12vh;
-}
+      .scroll-hint {
+        margin-top: 25px;
+        font-size: 0.9rem;
+        color: #94a3b8;
+        opacity: 0;
+        transform: translateY(10px);
+      }
 
-/* HERO */
-.hero {
-  z-index: 2;
-  align-items: center;
-  background: radial-gradient(circle at 30% 30%, rgba(59,130,246,0.4), transparent 60%);
-}
+      /* CONTENT */
+      .content {
+        position: fixed;
+        inset: 0;
+        opacity: 0;
+        pointer-events: none;
+        background: #0b1220;
 
-/* CONTENT */
-.content {
-  z-index: 1;
-  background: #0b1220;
-  opacity: 0;
-  overflow-y: auto;
-}
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-/* GRID */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 28px;
-  width: 80%;
-  max-width: 1000px;
-  margin: 0 auto;
-}
+      /* GRID */
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 40px;
+        width: 80%;
+        max-width: 1100px;
+      }
 
-/* CARD */
-.card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.15);
-  padding: 25px;
-  border-radius: 14px;
+      /* CARD */
+      .card {
+        text-decoration: none;
+        color: white;
 
-  opacity: 0;
-  transform: translateY(40px);
+        padding: 40px 30px;
+        border-radius: 18px;
 
-  transition: all 0.3s ease;
-}
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.12);
 
-/* GLOW */
-.card:hover {
-  transform: translateY(-8px) scale(1.03);
-  border-color: #38bdf8;
-  box-shadow:
-    0 0 20px rgba(56,189,248,0.3),
-    0 0 40px rgba(56,189,248,0.2);
-}
+        backdrop-filter: blur(12px);
 
-/* TEXT */
-h1 {
-  font-size: 3rem;
-  margin-bottom: 10px;
-}
+        opacity: 0;
+        transform: translateY(80px) scale(0.95);
 
-p {
-  color: #94a3b8;
-}
-</style>
-</head>
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
 
-<body>
+      /* CURSOR GLOW */
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
 
-<div class="wrapper">
+        background: radial-gradient(
+          200px circle at var(--x, 50%) var(--y, 50%),
+          rgba(56, 189, 248, 0.35),
+          transparent 60%
+        );
 
-  <div class="stage">
+        opacity: 0;
+        transition: opacity 0.25s ease;
+        pointer-events: none;
+      }
 
-    <!-- HERO -->
-    <div class="layer hero">
+      /* HOVER GLOW */
+      .card:hover::before {
+        opacity: 1;
+      }
+
+      /* OUTER SHADOW */
+      .card:hover {
+        box-shadow:
+          0 0 20px rgba(56, 189, 248, 0.25),
+          0 0 60px rgba(56, 189, 248, 0.15),
+          0 10px 40px rgba(0, 0, 0, 0.6);
+      }
+
+      .card h2 {
+        font-size: 1.6rem;
+        margin-bottom: 14px;
+      }
+
+      .card p {
+        color: #a5b4fc;
+        line-height: 1.6;
+        max-width: 260px;
+        margin: auto;
+      }
+
+      /* TITLE */
+      h1 {
+        font-size: 3rem;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <section class="hero">
       <h1>AI Beyond the Surface</h1>
-      <p>Scroll to explore</p>
-    </div>
 
-    <!-- CONTENT -->
-    <div class="layer content">
+      <p class="hero-desc">
+        Welcome to a space where we explore AI beyond formulas—breaking down
+        complex algorithms into intuitive insights that actually make sense.
+        Here, the focus is on clarity over complexity.
+      </p>
+
+      <h5 class="scroll-hint">Scroll Down to Explore ↓</h5>
+    </section>
+
+    <section class="content">
       <div class="grid">
+        <a href="/foundations/" class="card">
+          <h2>Foundations</h2>
+          <p>
+            Core ideas behind machine learning — geometry, statistics &
+            intuition
+          </p>
+        </a>
 
-        <div class="card">
-          <h3>Hat Matrix</h3>
-          <p>Projection & geometry intuition</p>
-        </div>
+        <a href="/deep-learning/" class="card">
+          <h2>Deep Learning</h2>
+          <p>Neural networks, optimization, and representation learning</p>
+        </a>
 
-        <div class="card">
-          <h3>Gradient Descent</h3>
-          <p>Optimization intuition</p>
-        </div>
-
-        <div class="card">
-          <h3>Eigen Intuition</h3>
-          <p>Linear transformations</p>
-        </div>
-
+        <a href="/reinforcement/" class="card">
+          <h2>Reinforcement Learning</h2>
+          <p>Learning through interaction, rewards, and decision-making</p>
+        </a>
       </div>
-    </div>
+    </section>
 
-  </div>
+    <div style="height: 220vh"></div>
 
-</div>
+    <script>
+      gsap.registerPlugin(ScrollTrigger);
 
-<script>
-gsap.registerPlugin(ScrollTrigger);
-
-window.addEventListener("load", () => {
-
-  // INITIAL STATES
-  gsap.set(".content", { opacity: 0 });
-  gsap.set(".card", { opacity: 0, y: 40 });
-
-  // =========================
-  // HERO ↔ CONTENT TRANSITION (SCROLL CONTROLLED)
-  // =========================
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: ".wrapper",
-      start: "top top",
-      end: "+=160%",
-      scrub: 1
-    }
-  });
-
-  tl.to(".hero", {
-    opacity: 0,
-    scale: 0.97,
-    ease: "power2.out"
-  });
-
-  tl.to(".content", {
-    opacity: 1,
-    ease: "power2.out"
-  }, "<0.2");
-
-  // =========================
-  // CARDS (TRIGGERED ONCE → FIXES HALF STATE BUG)
-  // =========================
-  ScrollTrigger.create({
-    trigger: ".wrapper",
-    start: "top+=55% top",
-    once: true,
-    onEnter: () => {
-      gsap.to(".card", {
-        opacity: 1,
-        y: 0,
-        stagger: 0.15,
-        duration: 0.8,
-        ease: "power3.out"
+      /* BACK NAV FIX */
+      window.addEventListener("pageshow", () => {
+        const navEntries = performance.getEntriesByType("navigation");
+        if (navEntries.length && navEntries[0].type === "back_forward") {
+          window.location.reload();
+        }
       });
-    }
-  });
 
-});
-</script>
+      window.addEventListener("load", () => {
+        // HERO INTRO
+        const heroTl = gsap.timeline();
 
-</body>
+        heroTl
+          .from(".hero h1", { opacity: 0, y: 40, duration: 0.8 })
+          .to(".hero-desc", { opacity: 1, y: 0, duration: 0.8 }, "-=0.4")
+          .to(".scroll-hint", { opacity: 1, y: 0, duration: 0.8 }, "+=0.3");
+
+        // FLOATING HINT
+        gsap.to(".scroll-hint", {
+          y: 6,
+          repeat: -1,
+          yoyo: true,
+          duration: 1.2,
+          ease: "power1.inOut",
+        });
+
+        // SCROLL TIMELINE
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: "body",
+            start: "top top",
+            end: "+=140%",
+            scrub: 1,
+          },
+        });
+
+        tl.to(".hero", { opacity: 0, y: -80 });
+
+        tl.to(
+          ".content",
+          {
+            opacity: 1,
+            onUpdate: function () {
+              const p = this.progress();
+              gsap.set(".content", {
+                pointerEvents: p > 0.5 ? "auto" : "none",
+              });
+            },
+          },
+          "<",
+        );
+
+        tl.to(
+          ".card",
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            stagger: 0.2,
+            ease: "power3.out",
+          },
+          "-=0.3",
+        );
+
+        // MAGNETIC + GLOW FOLLOW
+        document.querySelectorAll(".card").forEach((card) => {
+          card.addEventListener("mousemove", (e) => {
+            const rect = card.getBoundingClientRect();
+
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // glow follow
+            card.style.setProperty("--x", x + "px");
+            card.style.setProperty("--y", y + "px");
+
+            // magnetic movement
+            const moveX = (x - rect.width / 2) / 12;
+            const moveY = (y - rect.height / 2) / 12;
+
+            gsap.to(card, {
+              x: moveX,
+              y: moveY,
+              scale: 1.05,
+              duration: 0.25,
+              ease: "power2.out",
+            });
+          });
+
+          card.addEventListener("mouseleave", () => {
+            gsap.to(card, {
+              x: 0,
+              y: 0,
+              scale: 1,
+              duration: 0.4,
+              ease: "power3.out",
+            });
+          });
+        });
+      });
+    </script>
+  </body>
 </html>
