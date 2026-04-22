@@ -14,11 +14,8 @@
   font-family: 'Inter', sans-serif;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
+  height: 200vh; /* allows scroll */
   background:
     radial-gradient(circle at 20% 20%, rgba(59,130,246,0.5), transparent 50%),
     radial-gradient(circle at 80% 80%, rgba(99,102,241,0.4), transparent 50%),
@@ -28,13 +25,19 @@ body {
 
 /* HERO */
 .hero {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 100vh;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 20px;
+
+  transition: opacity 0.2s linear;
 }
 
 h1 {
@@ -49,25 +52,35 @@ h1 {
   line-height: 1.7;
 }
 
-/* SCROLL INDICATOR */
-.scroll-down {
+/* SCROLL TEXT */
+.scroll-text {
   margin-top: 40px;
   font-size: 0.9rem;
   color: #cbd5f5;
-  animation: bounce 1.2s infinite;
-  cursor: pointer;
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(8px); }
+  opacity: 0.8;
 }
 
 /* CONTENT */
 .content {
-  padding: 80px 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.3s ease;
+}
+
+.inner {
   max-width: 900px;
-  margin: auto;
+  width: 100%;
+  padding: 20px;
 }
 
 /* GRID */
@@ -77,36 +90,25 @@ h1 {
   gap: 20px;
 }
 
-/* CARDS (initial hidden state) */
+/* CARDS */
 .card {
-  opacity: 0;
-  transform: translateY(40px);
   backdrop-filter: blur(12px);
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 16px;
   padding: 25px;
-  transition: all 0.6s ease;
+  transition: 0.3s;
 }
 
-/* visible state */
-.card.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* hover effect */
 .card:hover {
   transform: translateY(-8px) scale(1.02);
   border-color: rgba(56,189,248,0.6);
   box-shadow: 0 10px 30px rgba(56,189,248,0.2);
 }
 
-/* text */
 .card-title {
   font-size: 1.2rem;
   margin-bottom: 10px;
-  color: white;
 }
 
 .card-desc {
@@ -118,88 +120,68 @@ a {
   text-decoration: none;
   color: inherit;
 }
-
-footer {
-  text-align: center;
-  margin-top: 40px;
-  color: #64748b;
-  font-size: 0.8rem;
-}
 </style>
 </head>
 
 <body>
 
 <!-- HERO -->
-<section class="hero">
+<div class="hero" id="hero">
   <h1>AI Beyond the Surface</h1>
-
   <div class="intro">
-    <p>
-      Welcome to my GitHub blog—where I break down machine learning concepts beyond formulas and into intuition.
-    </p>
-    <br>
-    <p>
-      I’m a Data Scientist by profession, and a lifelong learner who enjoys turning complex ideas into something clear and visual.
-    </p>
+    <p>Breaking down machine learning beyond formulas into intuition.</p>
   </div>
-
-  <div class="scroll-down" onclick="scrollToContent()">
-    ↓ Scroll to explore
-  </div>
-</section>
+  <div class="scroll-text">Scroll to explore ↓</div>
+</div>
 
 <!-- CONTENT -->
-<section id="content" class="content">
+<div class="content" id="content">
+  <div class="inner">
+    <div class="grid">
 
-  <div class="grid">
+      <a href="/hat-matrix">
+        <div class="card">
+          <div class="card-title">Hat Matrix</div>
+          <div class="card-desc">Projection & geometry</div>
+        </div>
+      </a>
 
-    <a href="/hat-matrix">
-      <div class="card">
-        <div class="card-title">Hat Matrix</div>
-        <div class="card-desc">Projection, leverage & geometry of regression</div>
-      </div>
-    </a>
+      <a href="/gradient-descent">
+        <div class="card">
+          <div class="card-title">Gradient Descent</div>
+          <div class="card-desc">Optimization intuition</div>
+        </div>
+      </a>
 
-    <a href="/gradient-descent">
-      <div class="card">
-        <div class="card-title">Gradient Descent</div>
-        <div class="card-desc">Optimization beyond formulas</div>
-      </div>
-    </a>
+      <a href="/eigen-intuition">
+        <div class="card">
+          <div class="card-title">Eigen Intuition</div>
+          <div class="card-desc">Directions & transformations</div>
+        </div>
+      </a>
 
-    <a href="/eigen-intuition">
-      <div class="card">
-        <div class="card-title">Eigen Intuition</div>
-        <div class="card-desc">Understanding directions & transformations</div>
-      </div>
-    </a>
-
+    </div>
   </div>
-
-  <footer>
-    Built by Anik 🚀
-  </footer>
-
-</section>
+</div>
 
 <script>
-function scrollToContent() {
-  document.getElementById("content").scrollIntoView({ behavior: "smooth" });
-}
+const hero = document.getElementById("hero");
+const content = document.getElementById("content");
 
-/* scroll animation */
-const cards = document.querySelectorAll('.card');
+window.addEventListener("scroll", () => {
+  const scrollY = window.scrollY;
+  const maxScroll = window.innerHeight;
 
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('show');
-    }
-  });
-}, { threshold: 0.2 });
+  const progress = Math.min(scrollY / maxScroll, 1);
 
-cards.forEach(card => observer.observe(card));
+  /* fade out hero */
+  hero.style.opacity = 1 - progress;
+  hero.style.transform = `translateY(-${progress * 50}px)`;
+
+  /* fade in content */
+  content.style.opacity = progress;
+  content.style.transform = `translateY(${40 - progress * 40}px)`;
+});
 </script>
 
 </body>
