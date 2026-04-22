@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Anik | ML Notes</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .intro {
+      color: #94a3b8;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      margin-bottom: 40px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 25px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-8px) scale(1.02);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(56, 189, 248, 0.6);
+      box-shadow: 0 10px 30px rgba(56, 189, 248, 0.2);
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: #94a3b8;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>ML Concepts, Clearly Explained</h1>
+
+    <div class="intro">
+      <p>
+        Welcome to my GitHub blog—where I break down machine learning concepts beyond formulas and into intuition.
+      </p>
+      <br>
+      <p>
+        I’m a Data Scientist by profession, and a lifelong learner who enjoys turning complex ideas into something clear and visual.
+      </p>
+    </div>
+
+    <div class="grid">
+
+      <a href="/hat-matrix">
+        <div class="card">
+          <div class="card-title">Hat Matrix</div>
+          <div class="card-desc">Projection, leverage & geometry of regression</div>
+        </div>
+      </a>
+
+      <a href="/gradient-descent">
+        <div class="card">
+          <div class="card-title">Gradient Descent</div>
+          <div class="card-desc">Optimization beyond formulas</div>
+        </div>
+      </a>
+
+      <a href="/eigen-intuition">
+        <div class="card">
+          <div class="card-title">Eigen Intuition</div>
+          <div class="card-desc">Understanding directions & transformations</div>
+        </div>
+      </a>
+
+    </div>
+
+    <footer>
+      Built by Anik 🚀
+    </footer>
+  </div>
+
+</body>
+</html>
