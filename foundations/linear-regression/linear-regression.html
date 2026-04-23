@@ -8,6 +8,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 
     <!-- MathJax -->
     <script>
@@ -31,6 +32,9 @@
   <body>
     <!-- SIDEBAR -->
     <aside class="sidebar">
+      <button id="toggleSidebar" class="toggle-btn">
+        <i data-lucide="menu"></i>
+      </button>
       <h2>Linear Regression</h2>
       <a href="#intro" class="nav">Introduction</a>
       <a href="#intuition" class="nav">Intuition</a>
@@ -456,6 +460,20 @@
         Plotly.Plots.resize("plot2d");
         Plotly.Plots.resize("loss3d");
       });
+      const toggleBtn = document.getElementById("toggleSidebar");
+      const sidebar = document.querySelector(".sidebar");
+      const content = document.querySelector(".content");
+
+      toggleBtn.onclick = () => {
+        sidebar.classList.toggle("collapsed");
+        content.classList.toggle("collapsed");
+
+        setTimeout(() => {
+          Plotly.Plots.resize("plot2d");
+          Plotly.Plots.resize("loss3d");
+        }, 300);
+      };
+      lucide.createIcons();
     </script>
   </body>
 </html>

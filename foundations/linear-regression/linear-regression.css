@@ -17,15 +17,20 @@ body {
    SIDEBAR
 ========================= */
 .sidebar {
+  position: fixed;
   width: 260px;
   height: 100vh;
-  position: fixed;
 
   padding: 40px 15px 20px;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
 
   background: rgba(2, 6, 23, 0.6);
   backdrop-filter: blur(10px);
+
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+
+  transition:
+    transform 0.35s ease,
+    width 0.35s ease;
 }
 
 .sidebar h2 {
@@ -242,4 +247,56 @@ input[type="range"] {
 
 .diagram-container svg text {
   fill: white;
+}
+
+.sidebar.collapsed {
+  transform: translateX(-200px);
+}
+
+.content.collapsed {
+  margin-left: 140px;
+  width: calc(100% - 140px);
+}
+
+.toggle-btn {
+  position: absolute;
+
+  top: 20px;
+  right: -45px; /* 👈 KEY: sticks outside sidebar */
+
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  cursor: pointer;
+
+  padding: 10px;
+  border-radius: 10px;
+
+  color: #e2e8f0;
+  font-size: 20px;
+
+  transition: all 0.25s ease;
+}
+
+.toggle-btn:hover {
+  background: rgba(56, 189, 248, 0.15);
+  transform: scale(1.1);
+}
+
+.toggle-btn:active {
+  transform: scale(0.95);
+}
+
+.content {
+  margin-left: 260px;
+  padding: 60px;
+  width: calc(100% - 260px);
+
+  transition:
+    margin-left 0.35s ease,
+    width 0.35s ease;
+}
+
+.content.expanded {
+  margin-left: 60px;
+  width: calc(100% - 60px);
 }
