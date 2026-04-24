@@ -23,7 +23,22 @@
         svg: {
           fontCache: "global",
         },
+        startup: {
+          pageReady: () => {
+            // Only MathJax should run here
+            return MathJax.startup.defaultPageReady();
+          },
+        },
       };
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <script>
+      // Run your app AFTER page load (NOT inside MathJax)
+      window.addEventListener("load", () => {
+        initObservers();
+      });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
@@ -38,10 +53,11 @@
       <h2>Linear Regression</h2>
       <a href="#intro" class="nav">Introduction</a>
       <a href="#intuition" class="nav">Intuition</a>
-      <a href="#geometry" class="nav">Geometry</a>
       <a href="#formulation" class="nav">Formulation</a>
+      <a href="#geometry" class="nav">Geometry</a>
       <a href="#hmatrix" class="nav">Hat Matrix</a>
       <a href="#probabilistic" class="nav">Probabilistic View</a>
+      <a href="#regularized" class="nav">Regularized Regression</a>
     </aside>
 
     <!-- CONTENT -->
@@ -57,11 +73,11 @@
 
       <section id="intro" class="section">
         <h1>Linear Regression = Projection</h1>
-        <p>
+        <p style="font-size: 1.15rem; line-height: 1.7">
           Linear regression is not curve fitting — it is projection into a
           subspace.
         </p>
-        <p>
+        <p style="font-size: 1.15rem; line-height: 1.7">
           Linear regression is often introduced as a method to “fit a line
           through data points”. But that’s misleading. At its core, linear
           regression is not about drawing a line — it is about finding the best
@@ -92,7 +108,7 @@
       <section id="intuition" class="section">
         <h1>Intuition</h1>
 
-        <p>
+        <p style="font-size: 1.15rem; line-height: 1.7">
           Linear regression tries to explain a relationship between inputs and
           outputs using a simple idea: Each input x is passed through a linear
           model to produce a prediction ŷ. This prediction is our best guess of
@@ -116,7 +132,7 @@
             alt="Linear Model Diagram"
           />
         </div>
-        <p>
+        <p style="font-size: 1.15rem; line-height: 1.7">
           So in short, the model tries to learn a function that best aligns
           predictions with reality, but it is constrained to remain linear.
           Because of this constraint, the model cannot perfectly pass through
@@ -131,49 +147,310 @@
           of this as exploring a landscape where each point represents a
           possible model, and the height represents the total error.
         </p>
+        <!-- 2D SIM -->
+        <div class="viz-box">
+          <p
+            style="
+              font-weight: bold;
+              text-align: center;
+              color: rgb(127, 255, 232);
+              margin-bottom: 10px;
+            "
+          >
+            Move the slider m and c to see how the line changes and how the
+            error changes. Try to find the line that minimizes the error !!!
+          </p>
+          <div class="viz-container">
+            <div id="plot2d"></div>
+            <div id="loss3d"></div>
+          </div>
+
+          <div class="controls centered-controls">
+            <label>m</label>
+            <input
+              type="range"
+              id="mSlider"
+              min="-5"
+              max="5"
+              step="0.1"
+              value="1"
+            />
+
+            <label>c</label>
+            <input
+              type="range"
+              id="cSlider"
+              min="-10"
+              max="10"
+              step="0.1"
+              value="0"
+            />
+
+            <div class="stats">
+              <p>m = <span id="mVal">1</span></p>
+              <p>c = <span id="cVal">0</span></p>
+              <p>Loss = <span id="lossVal">0</span></p>
+            </div>
+          </div>
+        </div>
         <p
           style="
+            margin-top: 3vh;
             font-weight: bold;
             text-align: center;
-            color: rgb(127, 255, 232);
+            color: rgb(153, 255, 127);
             margin-bottom: 10px;
           "
         >
-          Move the slider m and c to see how the line changes and how the error
-          changes. Try to find the line that minimizes the error !!!
+          The next obvious question is: how do we find this best line
+          mathematically and how we generalize this to higher dimensions? We
+          will answer this question in the next sections, but the key intuition
+          is that we can derive a closed-form solution for the optimal line by
+          using calculus to minimize the total error.
         </p>
-        <!-- 2D SIM -->
-        <div class="viz-container">
-          <div id="plot2d"></div>
-          <div id="loss3d"></div>
+      </section>
+      <section id="formulation" class="section">
+        <h1>Formulation</h1>
+        <div class="viz-box important-box">
+          <section class="notation">
+            <h2>Notation</h2>
+
+            <p style="font-size: 1.15rem; line-height: 1.7">
+              Before we begin, we define the notation used throughout this page
+              for clarity.
+            </p>
+
+            <ul>
+              <li><b>Scalar output:</b> \( y \)</li>
+
+              <li><b>Vector of outputs (all samples):</b> \( \mathbf{y} \)</li>
+
+              <li>
+                <b>Input for a single sample (feature vector):</b> \( \mathbf{x}
+                \)
+              </li>
+
+              <li><b>Input matrix (all samples):</b> \( \mathbf{X} \)</li>
+
+              <li>
+                <b>Noise (vector of errors):</b> \( \boldsymbol{\varepsilon} \)
+              </li>
+
+              <li><b>Parameter vector:</b> \( \boldsymbol{\beta} \)</li>
+
+              <li>
+                <b>Model function for a single sample:</b> \( f(\mathbf{x}) \)
+              </li>
+              <li>
+                <b>Model function for all samples:</b> \( \mathbf{f(X)} \)
+              </li>
+            </ul>
+
+            <p style="font-size: 1.15rem; line-height: 1.7">
+              Scalars are written in normal form, vectors in bold lowercase, and
+              matrices in bold uppercase.
+            </p>
+          </section>
         </div>
 
-        <div class="controls centered-controls">
-          <label>m</label>
-          <input
-            type="range"
-            id="mSlider"
-            min="-5"
-            max="5"
-            step="0.1"
-            value="1"
-          />
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          The Model formulation can be given as:
+        </p>
 
-          <label>c</label>
-          <input
-            type="range"
-            id="cSlider"
-            min="-10"
-            max="10"
-            step="0.1"
-            value="0"
-          />
+        <div class="math">
+          $$ \mathbf{y} = f\mathbf{(X)} + \boldsymbol{\varepsilon} $$
+        </div>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          One key assumption about the noise \( \boldsymbol{\varepsilon} \) is
+          that its conditional expectation given the inputs is zero. This means
+          that on average, the noise does not systematically bias our
+          predictions in any direction:
+        </p>
+        <div style="text-align: center">
+          $$ \mathbb{E}[\boldsymbol{\varepsilon} \mid \mathbf{X}] = 0 $$
+        </div>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          The most beautiful consequence of this assumption is it enables us to
+          arrive at this relation:
+        </p>
+        <div class="math-center">
+          $$\mathbb{E}[\mathbf{y} \mid \mathbf{X}] = \mathbb{E}[(f\mathbf{(X)} +
+          \boldsymbol{\varepsilon}) \mid \mathbf{X}] \;\Rightarrow\;
+          \mathbb{E}[f\mathbf{(X)} \mid \mathbf{X}] +
+          \mathbb{E}[\boldsymbol{\varepsilon} \mid \mathbf{X}]$$
+        </div>
 
-          <div class="stats">
-            <p>m = <span id="mVal">1</span></p>
-            <p>c = <span id="cVal">0</span></p>
-            <p>Loss = <span id="lossVal">0</span></p>
-          </div>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          Since \( f\mathbf{(X)} \) is deterministic given \( \mathbf{X} \), and
+          using the assumption \( \mathbb{E}[\boldsymbol{\varepsilon} \mid
+          \mathbf{X}] = 0 \):
+        </p>
+
+        <div class="math-center">
+          $$ \mathbb{E}[\mathbf{y} \mid \mathbf{X}] = f\mathbf{(X)} $$
+        </div>
+        <div class="viz-box important-box">
+          <p style="font-size: 1.15rem; line-height: 1.7">
+            This result shows a key idea in regression: the true regression
+            function is simply the average value of the output given the input.
+            If we fix a particular value \(\mathbf{x}\) and observe the
+            corresponding \(y\) many times, each observation will be slightly
+            different because of random noise (Think of it like you pass the
+            \(\mathbf{x}\) into a machine that converts this \(\mathbf{x}\) into
+            \(f(\mathbf{x})\), but this machine is not super precise so each
+            time add a random error to the \(f(\mathbf{x})\)). But if we take
+            the average of all those observed values, the randomness cancels out
+            and what remains is a stable pattern. That stable pattern is exactly
+            \(f(\mathbf{x})\), which represents the typical or expected value of
+            \(y\) for a given \(\mathbf{x}\). So, \(f(\mathbf{x})\) is not
+            trying to capture every individual fluctuation, but only the
+            underlying trend in the data.
+          </p>
+        </div>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          Now because the model is linear we can approximate the
+          \(f\mathbf{(x)}\) for a sample as as:
+        </p>
+        <div class="math-center">
+          $$ f(\mathbf{x}) \approx x_{0} + \sum_{i=1}^{p} x_{i} \beta_{i} $$
+        </div>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          For all the n data points we can write the vector of predictions as:
+        </p>
+        <div class="math-center">
+          $$ \begin{bmatrix} f(\mathbf{x}^{(1)}) \\ f(\mathbf{x}^{(2)}) \\
+          \vdots \\ f(\mathbf{x}^{(n)}) \end{bmatrix} = \begin{bmatrix} \beta_0
+          + \sum_{j=1}^{p} x_j^{(1)} \beta_j \\ \beta_0 + \sum_{j=1}^{p}
+          x_j^{(2)} \beta_j \\ \vdots \\ \beta_0 + \sum_{j=1}^{p} x_j^{(n)}
+          \beta_j \end{bmatrix}\;\;\Rightarrow\;\; \begin{bmatrix} 1 & x_1^{(1)}
+          & x_2^{(1)} & \cdots & x_p^{(1)} \\ 1 & x_1^{(2)} & x_2^{(2)} & \cdots
+          & x_p^{(2)} \\ \vdots & \vdots & \vdots & \ddots & \vdots \\ 1 &
+          x_1^{(n)} & x_2^{(n)} & \cdots & x_p^{(n)} \end{bmatrix}
+          \begin{bmatrix} \beta_0 \\ \beta_1 \\ \vdots \\ \beta_p
+          \end{bmatrix}$$
+        </div>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          We can write this more compactly as:
+        </p>
+        <div class="math-center">$$ f\mathbf{(X)} = X\boldsymbol{\beta} $$</div>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          The long story short is Linear Regression is all about finding \(
+          \boldsymbol{\beta} \) that minimize the total error between the
+          predictions and the true outputs
+        </p>
+
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          Before we go about solving for \( \boldsymbol{\beta} \), it is
+          important that the design matrix \( \mathbf{X} \) satisfies certain
+          conditions. One key requirement is that the features should be
+          linearly independent. This means that no feature can be expressed as a
+          linear combination of the others.
+        </p>
+
+        <div class="warning-box">
+          If this condition is violated, we have a problem called
+          multicollinearity, which can lead to unstable estimates of the
+          coefficients and make it difficult to interpret the model.
+        </div>
+
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          In practice, this often happens when we have more features than
+          samples, or when some features are highly correlated with each other.
+          To address this issue, we can use techniques like feature selection,
+          dimensionality reduction, or regularization to ensure that the model
+          remains stable and interpretable. These things will be covered in
+          later section. For now let's assume that our design matrix \(
+          \mathbf{X} \) satisfies this condition.
+        </p>
+
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          Now we move to the key step: solving for \( \boldsymbol{\beta} \). To
+          do this, we first need a way to measure how good a particular choice
+          of \( \boldsymbol{\beta} \) is.
+        </p>
+
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          Recall that our goal is to make the predictions \( f(\mathbf{X}) \) as
+          close as possible to the true outputs \( \mathbf{y} \). To quantify
+          this difference, we define a loss function based on the squared error.
+          This choice is natural because it penalizes large deviations more
+          heavily and leads to a smooth optimization problem.
+        </p>
+
+        <div class="math-center">
+          $$ L = \|\mathbf{y} - f(\mathbf{X})\|^2 $$
+        </div>
+
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          Expanding this in matrix form, the loss function can be written as:
+        </p>
+
+        <div class="math-center">
+          $$ L = (\mathbf{y} - f(\mathbf{X}))^T(\mathbf{y} - f(\mathbf{X}))
+          \;\;\Rightarrow\;\;(\mathbf{y} -
+          \mathbf{X}\boldsymbol{\beta})^T(\mathbf{y} -
+          \mathbf{X}\boldsymbol{\beta})$$
+        </div>
+
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          This formulation gives us a clear objective: choose \(
+          \boldsymbol{\beta} \) such that this squared error is minimized.
+        </p>
+
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          To find the optimal solution, we differentiate the loss function \( L
+          \) with respect to \( \boldsymbol{\beta} \) using matrix calculus and
+          set it to zero. This gives the first-order optimality condition:
+        </p>
+
+        <div class="math-center">
+          $$ \frac{\partial L}{\partial \boldsymbol{\beta}}
+          \bigg|_{\boldsymbol{\beta}=\hat{\boldsymbol{\beta}}} = -2 \mathbf{X}^T
+          (\mathbf{y} - \mathbf{X}\boldsymbol{\beta}) = 0 $$
+        </div>
+
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          Solving this equation leads to the condition that defines the optimal
+          parameter \( \hat{\boldsymbol{\beta}} \).
+        </p>
+
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          To ensure that this solution is indeed a minimum (and not a maximum or
+          saddle point), we check the second-order condition. The Hessian of the
+          loss function is:
+        </p>
+
+        <div class="math-center">
+          $$ \frac{\partial^2 L}{\partial \boldsymbol{\beta}^2} = 2 \mathbf{X}^T
+          \mathbf{X} $$
+        </div>
+
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          Due to the assumption that the columns of \( \mathbf{X} \) are
+          linearly independent, the matrix \( \mathbf{X}^T \mathbf{X} \) becomes
+          positive definite.
+        </p>
+
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          This has two important consequences. First, a positive definite matrix
+          is always invertible, which ensures that the solution for \(
+          \boldsymbol{\beta} \) is unique.
+        </p>
+
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          Second, it guarantees that the loss function is strictly convex,
+          meaning the point obtained from the optimality condition corresponds
+          to a true global minimum.
+        </p>
+
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          Now, from the first-order optimality condition:
+        </p>
+        <div class="math">
+          $$ \mathbf{X}^T\mathbf{y} =
+          \mathbf{X}^T\mathbf{X}\hat{\boldsymbol{\beta}}\;\;\Rightarrow\;\;
+          \hat{\boldsymbol{\beta}} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T
+          \mathbf{y} $$
         </div>
       </section>
 
@@ -183,18 +460,6 @@
         <p>Projection of y onto column space of X:</p>
 
         <div class="math">$$ \hat{y} = X\hat{\beta} $$</div>
-      </section>
-
-      <section id="formulation" class="section">
-        <h1>Formulation</h1>
-
-        <p>Model:</p>
-
-        <div class="math">$$ y = X\beta + \varepsilon $$</div>
-
-        <p>Solution:</p>
-
-        <div class="math">$$ \hat{\beta} = (X^T X)^{-1} X^T y $$</div>
       </section>
 
       <section id="hmatrix" class="section">
@@ -214,6 +479,22 @@
 
         <p>OLS becomes Maximum Likelihood Estimation under this assumption.</p>
       </section>
+      <section id="regularized" class="section">
+        <h1>Regularized Regression</h1>
+
+        <p>
+          To prevent overfitting, we can add a penalty term to the loss function
+          that discourages large coefficients.
+        </p>
+
+        <div class="math">
+          $$ \hat{\beta} = \arg\min_\beta ||y - X\beta||^2 + \lambda R(\beta) $$
+        </div>
+
+        <p>
+          Common choices for R(β) include L2 norm (Ridge) and L1 norm (Lasso).
+        </p>
+      </section>
     </main>
 
     <script>
@@ -224,20 +505,25 @@
       const sections = document.querySelectorAll(".section");
       const navLinks = document.querySelectorAll(".sidebar a");
 
-      // Fade-in observer (runs once per section)
+      /* =========================
+     FADE-IN OBSERVER
+  ========================= */
       const fadeObserver = new IntersectionObserver(
         (entries, obs) => {
           entries.forEach((entry) => {
-            if (entry.isIntersecting) {
+            if (entry.isIntersecting || entry.intersectionRatio > 0) {
               entry.target.classList.add("visible");
-              obs.unobserve(entry.target); // 👈 only once
+              obs.unobserve(entry.target);
             }
           });
         },
-        { threshold: 0.2 },
+        {
+          threshold: 0.01, // 👈 key fix for small screens
+          rootMargin: "0px 0px -10% 0px", // helps trigger earlier
+        },
       );
 
-      sections.forEach((s) => fadeObserver.observe(s));
+      // sections.forEach((s) => fadeObserver.observe(s));
 
       /* =========================
      SIDEBAR ACTIVE (CENTER BASED)
@@ -257,12 +543,36 @@
           });
         },
         {
-          rootMargin: "-50% 0px -50% 0px", // 👈 center of screen
+          rootMargin: "-45% 0px -45% 0px",
           threshold: 0,
         },
       );
 
-      sections.forEach((s) => navObserver.observe(s));
+      /* =========================
+     INIT (IMPORTANT FIX HERE)
+  ========================= */
+      function initObservers() {
+        sections.forEach((s) => {
+          fadeObserver.observe(s);
+          navObserver.observe(s);
+        });
+      }
+      /* =========================
+     SAFE BOOTSTRAP
+  ========================= */
+
+      function boot() {
+        // small delay ensures layout + mathjax + css are fully applied
+        setTimeout(() => {
+          initObservers();
+        }, 300);
+      }
+
+      if (document.readyState === "complete") {
+        boot();
+      } else {
+        window.addEventListener("load", boot);
+      }
 
       /* =========================
      DATA + MODEL
