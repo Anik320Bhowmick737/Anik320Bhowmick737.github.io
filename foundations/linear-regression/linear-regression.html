@@ -452,6 +452,26 @@
           \hat{\boldsymbol{\beta}} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T
           \mathbf{y} $$
         </div>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          Using this \(\hat{\boldsymbol{\beta}}\) the prediction is given as
+          follows:
+        </p>
+        <div class="math">
+          $$ \hat{\mathbf{y}} = \mathbf{X}\hat{\boldsymbol{\beta}} $$
+        </div>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          The difference between the observed values \( \mathbf{y} \) and the
+          predicted values \( \hat{\mathbf{y}} \) is called the residuals,
+          denoted as \( \mathbf{e} = \mathbf{y} - \hat{\mathbf{y}} \). These
+          residuals represent the portion of the data that the model fails to
+          capture. The goal of linear regression is to minimize the sum of
+          squared residuals, which is equivalent to maximizing the fit of the
+          model to the data. So the Loss function that we tried to minimize
+          reduces to this exact functional form:
+        </p>
+        <div class="math">
+          $$ L = \|\mathbf{y} - \hat{\mathbf{y}}\|^2 = \|\mathbf{e}\|^2 $$
+        </div>
       </section>
 
       <section id="geometry" class="section">
