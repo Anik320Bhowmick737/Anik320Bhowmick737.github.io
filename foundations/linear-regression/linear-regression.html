@@ -801,25 +801,6 @@
       /* =========================
      PLOTLY RESIZE FIX
   ========================= */
-
-      window.addEventListener("resize", () => {
-        Plotly.Plots.resize("plot2d");
-        Plotly.Plots.resize("loss3d");
-      });
-      const toggleBtn = document.getElementById("toggleSidebar");
-      const sidebar = document.querySelector(".sidebar");
-      const content = document.querySelector(".content");
-
-      toggleBtn.onclick = () => {
-        sidebar.classList.toggle("collapsed");
-        content.classList.toggle("collapsed");
-
-        setTimeout(() => {
-          Plotly.Plots.resize("plot2d");
-          Plotly.Plots.resize("loss3d");
-        }, 300);
-      };
-      lucide.createIcons();
     </script>
     <script>
       /* =========================
@@ -918,13 +899,39 @@
 
             font: { color: "white" },
             showlegend: true,
-
-            annotations: annotations, // 👈 KEY FIX
+            annotations: annotations,
+          },
+          {
+            responsive: true, // 👈 THIS IS CRITICAL
           },
         );
       }
 
       drawResidualPlot();
+    </script>
+    <script>
+      /* =========================
+     PLOTLY RESIZE FIX
+  ========================= */ window.addEventListener("resize", () => {
+        Plotly.Plots.resize("plot2d");
+        Plotly.Plots.resize("loss3d");
+        Plotly.Plots.resize("residualPlot");
+      });
+      const toggleBtn = document.getElementById("toggleSidebar");
+      const sidebar = document.querySelector(".sidebar");
+      const content = document.querySelector(".content");
+
+      toggleBtn.onclick = () => {
+        sidebar.classList.toggle("collapsed");
+        content.classList.toggle("collapsed");
+
+        setTimeout(() => {
+          Plotly.Plots.resize("plot2d");
+          Plotly.Plots.resize("loss3d");
+          Plotly.Plots.resize("residualPlot");
+        }, 300);
+      };
+      lucide.createIcons();
     </script>
   </body>
 </html>
