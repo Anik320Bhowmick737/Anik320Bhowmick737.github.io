@@ -332,7 +332,9 @@
         <p style="font-size: 1.15rem; line-height: 1.7">
           We can write this more compactly as:
         </p>
-        <div class="math-center">$$ f\mathbf{(X)} = X\boldsymbol{\beta} $$</div>
+        <div class="math-center">
+          $$ f\mathbf{(X)} = \mathbf{X}\boldsymbol{\beta} $$
+        </div>
         <p style="font-size: 1.15rem; line-height: 1.7">
           The long story short is Linear Regression is all about finding \(
           \boldsymbol{\beta} \) that minimize the total error between the
@@ -471,6 +473,20 @@
         </p>
         <div class="math">
           $$ L = \|\mathbf{y} - \hat{\mathbf{y}}\|^2 = \|\mathbf{e}\|^2 $$
+        </div>
+        <div class="viz-box important-box">
+          <div id="residualPlot" style="height: 450px"></div>
+          <p
+            style="
+              margin-top: 3vh;
+              font-weight: bold;
+              text-align: center;
+              color: rgb(153, 255, 127);
+              margin-bottom: 10px;
+            "
+          >
+            Residuals visualized in the 2D.
+          </p>
         </div>
       </section>
 
@@ -804,6 +820,111 @@
         }, 300);
       };
       lucide.createIcons();
+    </script>
+    <script>
+      /* =========================
+   STATIC RESIDUAL PLOT
+========================= */
+      const statpoints2D = [
+        { x: 1, y: 2.2 },
+        { x: 2, y: 2.8 },
+        { x: 3, y: 5.5 },
+        { x: 4, y: 3.7 },
+        { x: 5, y: 6.2 },
+        { x: 6, y: 7.8 },
+        { x: 7, y: 6.5 },
+        { x: 8, y: 9.2 },
+      ];
+
+      function drawResidualPlot() {
+        const m = minPoint.m;
+        const c = minPoint.c;
+
+        const xs = [];
+        const ys = [];
+
+        for (let x = 0; x <= 9; x += 0.1) {
+          xs.push(x);
+          ys.push(m * x + c);
+        }
+
+        const pointsTrace = {
+          x: statpoints2D.map((p) => p.x),
+          y: statpoints2D.map((p) => p.y),
+          mode: "markers",
+          type: "scatter",
+          name: "data",
+          marker: { size: 8, color: "#38bdf8" },
+        };
+
+        const lineTrace = {
+          x: xs,
+          y: ys,
+          mode: "lines",
+          name: "best fit",
+          line: { color: "#a78bfa", width: 3 },
+        };
+
+        const residualTraces = [];
+        const annotations = [];
+
+        statpoints2D.forEach((p, i) => {
+          const y_hat = m * p.x + c;
+          const r = p.y - y_hat;
+
+          // residual line
+          residualTraces.push({
+            x: [p.x, p.x],
+            y: [p.y, y_hat],
+            mode: "lines",
+            type: "scatter",
+            showlegend: false,
+            line: {
+              color: "#ef4444",
+              width: 2,
+              dash: "dash",
+            },
+          });
+
+          // 🔥 annotation (no overlap guaranteed)
+          annotations.push({
+            x: p.x,
+            y: (p.y + y_hat) / 2,
+            text: `r${i + 1} = ${r.toFixed(2)}`,
+            showarrow: true,
+
+            ax: i % 2 === 0 ? 40 : -40, // horizontal shift
+            ay: i % 3 === 0 ? -30 : 30, // vertical shift
+
+            arrowcolor: "#f87171",
+            font: { color: "#f87171", size: 12 },
+
+            bgcolor: "rgba(0,0,0,0.7)", // 🔥 readability boost
+            bordercolor: "#f87171",
+            borderwidth: 1,
+          });
+        });
+
+        Plotly.newPlot(
+          "residualPlot",
+          [pointsTrace, lineTrace, ...residualTraces],
+          {
+            paper_bgcolor: "#111827",
+            plot_bgcolor: "#111827",
+            margin: { t: 30 },
+
+            xaxis: { title: "x", range: [0, 9] },
+            yaxis: { title: "y", range: [0, 11] },
+
+            font: { color: "white" },
+            showlegend: true,
+
+            annotations: annotations, // 👈 KEY FIX
+          },
+        );
+      }
+
+      drawResidualPlot();
     </script>
   </body>
 </html>
