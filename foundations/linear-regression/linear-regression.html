@@ -492,18 +492,98 @@
 
       <section id="geometry" class="section">
         <h1>Geometry</h1>
-
-        <p>Projection of y onto column space of X:</p>
-
-        <div class="math">$$ \hat{y} = X\hat{\beta} $$</div>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          Now the time has come to understand why Linear Regression is actually
+          a projection. Recall the model prediction is given by \(
+          \hat{\mathbf{y}} = \mathbf{X}\hat{\boldsymbol{\beta}} \). This means
+          that the predicted values \( \hat{\mathbf{y}} \) are in the column
+          space of \( \mathbf{X} \). We can see it precisely as follows, :
+        </p>
+        <div class="math-center">
+          $$ \text{write}\;\ \mathbf{X}\;\ \text{in terms of columns:}\;\
+          \mathbf{X} = \begin{bmatrix} \mathbf{x}_1 & \mathbf{x}_2 & \cdots &
+          \mathbf{x}_p \end{bmatrix} $$
+        </div>
+        <div class="math-center">
+          $$ \hat{\mathbf{y}} = \hat{\beta}_0 + \hat{\beta}_1 \mathbf{x}_1 +
+          \hat{\beta}_2 \mathbf{x}_2 + \cdots + \hat{\beta}_p \mathbf{x}_p $$
+        </div>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          This makes an important point clear: the predicted vector \(
+          \hat{\mathbf{y}} \) is nothing but a linear combination of the columns
+          of \( \mathbf{X} \). Therefore, it must lie entirely within the column
+          space of \( \mathbf{X} \). In other words, no matter what the true
+          output \( \mathbf{y} \) is, our model is restricted to choosing \(
+          \hat{\mathbf{y}} \) from this subspace.
+        </p>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          This also means that there are infinitely many possible vectors inside
+          this subspace that could serve as predictions, depending on the choice
+          of \( \boldsymbol{\beta} \). The key question, therefore, is: which
+          one does the model choose? The answer comes from the optimality
+          condition of the least squares problem.
+        </p>
+        <div class="math">
+          $$ \mathbf{X}^T (\mathbf{y} - \hat{\mathbf{y}}) = 0 $$
+        </div>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          This condition tells us that the residual vector \( \mathbf{r} =
+          \mathbf{y} - \hat{\mathbf{y}} \) is orthogonal to every column of \(
+          \mathbf{X} \), and therefore orthogonal to the entire column space of
+          \( \mathbf{X} \). In other words, the error made by the model has no
+          component in any direction that the model can represent. This
+          condition uniquely determines \( \hat{\boldsymbol{\beta}} \), and
+          hence fixes the prediction \( \hat{\mathbf{y}} \). As a result, among
+          all possible vectors in the column space of \( \mathbf{X} \), it
+          selects the one that minimizes the distance between \( \mathbf{y} \)
+          and \( \hat{\mathbf{y}} \).
+        </p>
+        <div class="viz-box important-box">
+          <div id="projection3D" style="width: 100%; height: 600px"></div>
+          <p
+            style="
+              margin-top: 3vh;
+              font-weight: bold;
+              text-align: center;
+              color: rgb(153, 255, 127);
+              margin-bottom: 10px;
+            "
+          >
+            Visualization of the projection in 3D. The plane represents the
+            column space of X.
+          </p>
+        </div>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          So far, we have interpreted \(\hat{\mathbf{y}}\) as the projection of
+          \(\mathbf{y}\). We now ask whether there exists a linear operator that
+          maps \(\mathbf{y}\) directly to \(\hat{\mathbf{y}}\) without
+          explicitly computing \(\hat{\boldsymbol{\beta}}\). Indeed, such an
+          operator exists and is called the <b>Hat Matrix</b>, denoted by
+          \(\mathbf{H}\):
+        </p>
+        <div class="math">
+          $$ \hat{\mathbf{y}} = \mathbf{X} \hat{\boldsymbol{\beta}} $$
+        </div>
+        <div class="math">
+          $$ \hat{\mathbf{y}} = \underbrace{\mathbf{X}(\mathbf{X}^T
+          \mathbf{X})^{-1}\mathbf{X}^T}_{ \mathbf{H}} \, \mathbf{y} $$
+        </div>
+        <div class="math">$$ \hat{\mathbf{y}} = \mathbf{H} \mathbf{y} $$</div>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          We will explore Hat Matrix and its beautiful properties in the next
+          section.
+        </p>
       </section>
 
       <section id="hmatrix" class="section">
-        <h1>Hat Matrix</h1>
+        <h1>Hat Matrix Deep dive</h1>
 
         <div class="math">$$ \hat{y} = Hy $$</div>
 
-        <div class="math">$$ H = X (X^T X)^{-1} X^T $$</div>
+        <div class="math">
+          $$ \mathbf{H} = \mathbf{X} (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T
+          $$
+        </div>
       </section>
 
       <section id="probabilistic" class="section">
@@ -932,6 +1012,172 @@
         }, 300);
       };
       lucide.createIcons();
+    </script>
+    <script>
+      /* =========================
+   PLANE (COLUMN SPACE)
+========================= */
+
+      const planeX = [];
+      const planeY = [];
+      const planeZ = [];
+
+      for (let x = -6; x <= 6; x += 1) {
+        for (let y = -6; y <= 6; y += 1) {
+          planeX.push(x);
+          planeY.push(y);
+          planeZ.push(0);
+        }
+      }
+
+      /* =========================
+   VECTORS (MULTIPLE)
+========================= */
+
+      const vectors = [
+        { y: [2, 3, 5], color: "#f43f5e", name: "y₁" },
+        { y: [-3, 2, 4], color: "#38bdf8", name: "y₂" },
+        { y: [4, -2, 3], color: "#f97316", name: "y₃" },
+      ];
+
+      const traces = [];
+
+      /* =========================
+   PLANE TRACE
+========================= */
+
+      traces.push({
+        type: "mesh3d",
+        x: planeX,
+        y: planeY,
+        z: planeZ,
+        opacity: 0.3,
+        color: "#a78bfa",
+        name: "column space",
+      });
+
+      /* =========================
+   BUILD ALL VECTORS
+========================= */
+
+      vectors.forEach((v, i) => {
+        const y = v.y;
+        const yhat = [y[0], y[1], 0]; // projection onto plane z=0
+        const r = [y[0] - yhat[0], y[1] - yhat[1], y[2] - yhat[2]];
+
+        // ---- y line ----
+        traces.push({
+          type: "scatter3d",
+          mode: "lines",
+          x: [0, y[0]],
+          y: [0, y[1]],
+          z: [0, y[2]],
+          line: { width: 6, color: v.color },
+          showlegend: false,
+        });
+
+        // ---- y arrow ----
+        traces.push({
+          type: "cone",
+          x: [y[0]],
+          y: [y[1]],
+          z: [y[2]],
+          u: [y[0]],
+          v: [y[1]],
+          w: [y[2]],
+          sizemode: "absolute",
+          sizeref: 0.6,
+          colorscale: [
+            [0, v.color],
+            [1, v.color],
+          ],
+          showscale: false,
+        });
+
+        // ---- y label ----
+        traces.push({
+          type: "scatter3d",
+          mode: "text",
+          x: [y[0]],
+          y: [y[1]],
+          z: [y[2] + 0.6],
+          text: [v.name],
+          textfont: { size: 14, color: v.color },
+          showlegend: false,
+        });
+
+        // ---- yhat line ----
+        traces.push({
+          type: "scatter3d",
+          mode: "lines",
+          x: [0, yhat[0]],
+          y: [0, yhat[1]],
+          z: [0, yhat[2]],
+          line: { width: 6, color: "#22c55e" },
+          showlegend: false,
+        });
+
+        // ---- yhat arrow ----
+        traces.push({
+          type: "cone",
+          x: [yhat[0]],
+          y: [yhat[1]],
+          z: [yhat[2]],
+          u: [yhat[0]],
+          v: [yhat[1]],
+          w: [yhat[2]],
+          sizemode: "absolute",
+          sizeref: 0.6,
+          colorscale: [
+            [0, "#22c55e"],
+            [1, "#22c55e"],
+          ],
+          showscale: false,
+        });
+
+        // ---- yhat label ----
+        traces.push({
+          type: "scatter3d",
+          mode: "text",
+          x: [yhat[0]],
+          y: [yhat[1]],
+          z: [yhat[2] + 0.6],
+          text: [`ŷ${i + 1}`],
+          textfont: { size: 14, color: "#22c55e" },
+          showlegend: false,
+        });
+
+        // ---- residual ----
+        traces.push({
+          type: "scatter3d",
+          mode: "lines",
+          x: [yhat[0], y[0]],
+          y: [yhat[1], y[1]],
+          z: [yhat[2], y[2]],
+          line: { width: 5, dash: "dash", color: "#facc15" },
+          showlegend: i === 0, // show only once in legend
+          name: "residual",
+        });
+      });
+
+      /* =========================
+   PLOT
+========================= */
+
+      Plotly.newPlot("projection3D", traces, {
+        paper_bgcolor: "#111827",
+        autosize: true,
+        margin: { l: 0, r: 0, t: 0, b: 0 },
+
+        scene: {
+          xaxis: { title: "x" },
+          yaxis: { title: "y" },
+          zaxis: { title: "z" },
+          aspectmode: "cube", // 👈 very important (no distortion)
+        },
+
+        font: { color: "white" },
+      });
     </script>
   </body>
 </html>
