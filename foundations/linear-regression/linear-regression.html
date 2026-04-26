@@ -55,7 +55,7 @@
       <a href="#intuition" class="nav">Intuition</a>
       <a href="#formulation" class="nav">Formulation</a>
       <a href="#geometry" class="nav">Geometry</a>
-      <a href="#hmatrix" class="nav">Hat Matrix</a>
+      <a href="#hmatrix" class="nav">Hat Matrix Deep Dive</a>
       <a href="#probabilistic" class="nav">Probabilistic View</a>
       <a href="#regularized" class="nav">Regularized Regression</a>
     </aside>
@@ -501,8 +501,8 @@
         </p>
         <div class="math-center">
           $$ \text{write}\;\ \mathbf{X}\;\ \text{in terms of columns:}\;\
-          \mathbf{X} = \begin{bmatrix} \mathbf{x}_1 & \mathbf{x}_2 & \cdots &
-          \mathbf{x}_p \end{bmatrix} $$
+          \mathbf{X} = \begin{bmatrix} 1 & \mathbf{x}_1 & \mathbf{x}_2 & \cdots
+          & \mathbf{x}_p \end{bmatrix} $$
         </div>
         <div class="math-center">
           $$ \hat{\mathbf{y}} = \hat{\beta}_0 + \hat{\beta}_1 \mathbf{x}_1 +
@@ -565,7 +565,8 @@
           $$ \hat{\mathbf{y}} = \mathbf{X} \hat{\boldsymbol{\beta}} $$
         </div>
         <div class="math">
-          $$ \hat{\mathbf{y}} = \underbrace{\mathbf{X}(\mathbf{X}^T
+          $$ \text{Let's expand the}\;\ \hat{\boldsymbol{\beta}}:\;\
+          \hat{\mathbf{y}} = \underbrace{\mathbf{X}(\mathbf{X}^T
           \mathbf{X})^{-1}\mathbf{X}^T}_{ \mathbf{H}} \, \mathbf{y} $$
         </div>
         <div class="math">$$ \hat{\mathbf{y}} = \mathbf{H} \mathbf{y} $$</div>
@@ -576,14 +577,185 @@
       </section>
 
       <section id="hmatrix" class="section">
-        <h1>Hat Matrix Deep dive</h1>
+        <h1>Hat Matrix Deep Dive</h1>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          As we have introduced in the previous section, the Hat Matrix \(
+          \mathbf{H} \) is a fundamental concept in linear regression that
+          encapsulates the entire process of projecting the observed data \(
+          \mathbf{y} \) onto the column space of the design matrix \( \mathbf{X}
+          \). Now it is time to explore the properties of this matrix. Why it is
+          called the "Hat" Matrix? The name "Hat" comes from the fact that it
+          puts a "hat" on the vector \( \mathbf{y} \) to produce the predicted
+          values \( \hat{\mathbf{y}} \). The Hat Matrix has several important
+          properties that make it a powerful tool for understanding the geometry
+          of linear regression:
+        </p>
+        <div class="math">
+          $$ \text{Let's take transpose of}\;\ \mathbf{H}\;\ \text{matrix}:\;\
+          \textbf{H}^T = \left(\mathbf{X}(\mathbf{X}^T
+          \mathbf{X})^{-1}\mathbf{X}^T\right)^T = \mathbf{H} $$
+        </div>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          This means that the Hat Matrix is symmetric, The consequence of this
+          is as follows.
+        </p>
 
+        <ul style="font-size: 1.15rem; line-height: 1.7">
+          <li><b>Balanced projection:</b> treats all directions fairly</li>
+          <li><b>No skew:</b> does not tilt or bias the vector</li>
+          <li><b>No distortion:</b> preserves geometric relationships</li>
+          <li>
+            <b>Pure projection:</b> only removes components outside the subspace
+          </li>
+        </ul>
+        <div class="math">
+          $$ \text{Let's left/ right muliply}\;\ \mathbf{H}\;\ \text{with}\;\
+          \mathbf{H}:\;\ \mathbf{H}\times \mathbf{H} =
+          \left(\mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1}\mathbf{X}^T\right)
+          \times \left(\mathbf{X}(\mathbf{X}^T
+          \mathbf{X})^{-1}\mathbf{X}^T\right) = \mathbf{H} $$
+        </div>
+        <div class="math">
+          $$ \text{So long story short its an idempotent matrix}\;\:
+          \mathbf{H}^2 = \mathbf{H} $$
+        </div>
         <div class="math">$$ \hat{y} = Hy $$</div>
 
         <div class="math">
           $$ \mathbf{H} = \mathbf{X} (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T
           $$
         </div>
+        <ul style="font-size: 1.15rem; line-height: 1.7">
+          <li><b>Project once:</b> the vector is mapped onto the subspace</li>
+          <li>
+            <b>Project again:</b> nothing changes — it is already in the
+            subspace
+          </li>
+          <li>
+            <b>No further effect:</b> repeated applications leave the result
+            unchanged
+          </li>
+          <li>
+            <b>Key idea:</b> this behavior is the signature of projection
+            matrices
+          </li>
+        </ul>
+        <div class="math">
+          $$\text{Expanding}\;\ \mathbf{H}\;\ \text{into its elements}\;\
+          \mathbf{H} = \begin{bmatrix} h_{11} & h_{12} & h_{13} & \cdots &
+          h_{1n} \\ h_{21} & h_{22} & h_{23} & \cdots & h_{2n} \\ h_{31} &
+          h_{32} & h_{33} & \cdots & h_{3n} \\ \vdots & \vdots & \vdots & \ddots
+          & \vdots \\ h_{n1} & h_{n2} & h_{n3} & \cdots & h_{nn} \end{bmatrix}
+          $$
+        </div>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          Each entry \(h_{ij}\) tells us how the \(j^{th}\) observed value
+          influences the fitted value \(\hat{y}_i\).
+        </p>
+        <div class="math">
+          $$ \hat{y}_i = h_{i1}y_1 + h_{i2}y_2 + \cdots + h_{in}y_n $$
+        </div>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          In particular, the diagonal elements \(h_{ii}\) measure how much each
+          observation influences its own fitted value. These are called
+          <b>leverage values</b>.
+        </p>
+        <div class="math">
+          $$ \text{Another important property we can show}:\;\
+          \mathbf{H}\mathbf{X} = \mathbf{X} $$
+        </div>
+        <div class="math">
+          $$ \begin{bmatrix} h_{11} & h_{12} & \cdots & h_{1n} \\ h_{21} &
+          h_{22} & \cdots & h_{2n} \\ \vdots & \vdots & \ddots & \vdots \\
+          h_{n1} & h_{n2} & \cdots & h_{nn} \end{bmatrix} \quad \begin{bmatrix}
+          1 & x_{11} & x_{12} & \cdots \\ 1 & x_{21} & x_{22} & \cdots \\ \vdots
+          & \vdots & \vdots & \\ 1 & x_{n1} & x_{n2} & \cdots \end{bmatrix} =
+          \begin{bmatrix} 1 & x_{11} & x_{12} & \cdots \\ 1 & x_{21} & x_{22} &
+          \cdots \\ \vdots & \vdots & \vdots & \\ 1 & x_{n1} & x_{n2} & \cdots
+          \end{bmatrix} $$
+        </div>
+        <div class="math">
+          $$ \mathbf{H}\mathbf{X} = \begin{bmatrix} \sum_{j=1}^{n} h_{1j} &
+          \sum_{j=1}^{n} h_{1j} x_{j1} & \sum_{j=1}^{n} h_{1j} x_{j2} & \cdots
+          \\ \sum_{j=1}^{n} h_{2j} & \sum_{j=1}^{n} h_{2j} x_{j1} &
+          \sum_{j=1}^{n} h_{2j} x_{j2} & \cdots \\ \sum_{j=1}^{n} h_{3j} &
+          \sum_{j=1}^{n} h_{3j} x_{j1} & \sum_{j=1}^{n} h_{3j} x_{j2} & \cdots
+          \\ \vdots & \vdots & \vdots & \ddots \end{bmatrix} = \begin{bmatrix} 1
+          & x_{11} & x_{12} & \cdots \\ 1 & x_{21} & x_{22} & \cdots \\ \vdots &
+          \vdots & \vdots & \\ 1 & x_{n1} & x_{n2} & \cdots \end{bmatrix} $$
+        </div>
+        <div class="math">
+          $$\text{Comparing elementwise clearly shows}:\;\ \sum_{j=1}^{n} h_{ij}
+          = 1\;\ \text{&}\;\ \sum_{j=1}^{n} h_{ij} x_{jk} = x_{ik}\ $$
+        </div>
+        <ul style="font-size: 1.15rem; line-height: 1.7">
+          <li><b>Rows/ Cols sum to 1</b> → behaves like a weighted average</li>
+          <li>
+            <b>Reconstructs features</b> → preserves all columns of
+            \(\mathbf{X}\)
+          </li>
+          <li>
+            <b>Acts as identity</b> → on the column space of \(\mathbf{X}\)
+          </li>
+          <li><b>Key takeaway</b> → \(\mathbf{H}\mathbf{X} = \mathbf{X}\)</li>
+        </ul>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          To further understand the structure of \(\mathbf{H}\), we now examine
+          its
+          <b>trace</b>, defined as the sum of its diagonal elements:
+        </p>
+        <div class="math">
+          $$ \mathrm{trace}(\mathbf{H}) = \sum_{i=1}^{n} h_{ii} $$
+        </div>
+        <div class="math">
+          $$ \mathrm{trace}(\mathbf{H}) =
+          \mathrm{trace}\big(\mathbf{X}(X^TX)^{-1}X^T\big) $$
+        </div>
+        <div class="math">
+          $$ \text{Cyclic property enables us}:\;\ \mathrm{trace}(\mathbf{H}) =
+          \mathrm{trace}\big((X^TX)^{-1}X^TX\big) = trace(\mathbf{I}) = p+1 $$
+        </div>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          Using the cyclic property of trace, the expression simplifies to the
+          trace of the identity matrix, which equals the number of columns of
+          \(\mathbf{X}\). Thus, the trace of \(\mathbf{H}\) equals the number of
+          features plus the intercept. So finally we can conclude
+        </p>
+        <ul style="font-size: 1.15rem; line-height: 1.7">
+          <li>
+            Sum of <b>Diagonal entries or leverage \(h_{ii}\)</b> is nothing but
+            the number of parameters in the model (including intercept)
+          </li>
+        </ul>
+        <p style="font-size: 1.15rem; line-height: 1.7">
+          Now the final part we will focus on the eigen values of the Hat
+          matrix.
+        </p>
+        <div class="math">$$ \mathbf{H}\mathbf{v} = \lambda \mathbf{v} $$</div>
+        <div class="math">
+          $$ \text{Apply}\;\ \mathbf{H}\;\ \text{to both sides}: \;\
+          \mathbf{H}^2\mathbf{v} = \lambda \mathbf{H}\mathbf{v} = \lambda^2
+          \mathbf{v} $$
+        </div>
+        <div class="math">
+          $$ \text{Now using Idempotent property}:\;\ \mathbf{H}\mathbf{v} =
+          \lambda\mathbf{v} = \lambda^2 \mathbf{v} $$
+        </div>
+        <div class="math">
+          $$ \text{Solving for}\;\ \lambda:\;\ \lambda = 0 \text{ or } \lambda =
+          1 $$
+        </div>
+        <div class="math">
+          $$ \text{Also}\;\ \sum_{i=1}^{n}\lambda_i = \mathrm{trace}(\mathbf{H})
+          = p+1 $$
+        </div>
+        <ul style="font-size: 1.15rem; line-height: 1.7">
+          <li><b>Eigenvalues of H:</b> 0 and 1</li>
+          <li>
+            <b>Multiplicity of 1:</b> equals \(\mathrm{rank}(X)\), i.e p+1
+          </li>
+          <li><b>Multiplicity of 0:</b> \(n - (p+1)\)</li>
+        </ul>
       </section>
 
       <section id="probabilistic" class="section">
